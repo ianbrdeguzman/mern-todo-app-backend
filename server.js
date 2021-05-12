@@ -17,7 +17,7 @@ mongoose.connection.once('open', () => {
 });
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -55,7 +55,7 @@ app.delete('/delete/:id', (req, res) => {
 });
 
 app.delete('/delete', (req, res) => {
-    Todo.remove({ completed: true }, (err, todo) => {
+    Todo.deleteMany({ completed: true }, (err, todo) => {
         if (err) {
             console.log(err);
         } else {
