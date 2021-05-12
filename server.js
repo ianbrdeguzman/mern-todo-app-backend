@@ -8,6 +8,7 @@ mongoose.connect(
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,
+        useFindAndModify: false,
     }
 );
 
@@ -22,7 +23,13 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    Todo.find().then((todos) => res.json(todos));
+    Todo.find({}, (err, todos) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.json(todos);
+        }
+    });
 });
 
 app.post('/create', (req, res) => {
@@ -36,10 +43,38 @@ app.post('/create', (req, res) => {
         });
 });
 
-app.get('/:id', (req, res) => {
+app.delete('/delete/:id', (req, res) => {
     const id = req.params.id;
-    Todo.findById(id, (err, todo) => {
-        res.json(todo);
+    Todo.findByIdAndDelete(id, (err, todo) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.json(todo);
+        }
+    });
+});
+
+app.delete('/delete', (req, res) => {
+    Todo.remove({ completed: true }, (err, todo) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.json(todo);
+        }
+    });
+});
+
+app.put('/update/:id', (req, res) => {
+    const id = req.params.id;
+    const bool = req.body.completed;
+    const filter = { _id: id };
+    const update = { completed: bool };
+    Todo.findOneAndUpdate(filter, update, { new: true }, (err, todo) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.json(todo);
+        }
     });
 });
 
